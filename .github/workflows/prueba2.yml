@@ -1,0 +1,117 @@
+name: esteeeeee porfavooor 2
+
+# Evento para que se deployee cuando se hace el push
+# on:
+#   push:
+#     branches:
+#       - main
+
+# Este evento es para que solo se deployee si se lo digo manualmente
+on:
+  workflow_dispatch:
+
+jobs:
+  # Job para desplegar infraestructura de Terraform
+  despliegue:
+    runs-on: ubuntu-latest
+    
+    outputs:
+      bucket_nombre: ${{ steps.capturar_bucket.outputs.bucket_nombre }}
+      ecr_repository_uri_url: ${{ steps.capturar_ecr_uri_url.outputs.ecr_repository_uri_url }}
+      ecr_nombre_repositorio: ${{ steps.capturar_ecr_nombre.outputs.ecr_nombre_repositorio }}
+      
+    steps:
+      # Este paso copia lo que hay en la rama main en la máquina virtual de Ubuntu
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: "us-east-1"
+          
+      # Este paso es para instalar Terraform en la máquina virtual
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init
+        id: init
+        run: terraform init
+        working-directory: ./pruebaA
+       
+      - name: Plan Terraform
+        run: terraform plan
+        working-directory: ./pruebaA
+  
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: ./pruebaA
+
+      - name: Subir tfstate al bucket de S3
+        run: aws s3 cp terraform.tfstate s3://$(terraform output -raw s3) --region us-east-1 
+        working-directory: ./pruebaA
+
+      # Capturar los outputs de Terraform y hacerlos como outputs del job
+      - name: Capturar output de Terraform (Bucket)
+        id: capturar_bucket
+        run: echo "bucket_nombre=$(terraform output -raw s3)" >> "$GITHUB_OUTPUT"
+        working-directory: ./pruebaA
+
+      - name: Capturar URI del repositorio ECR
+        id: capturar_ecr_uri_url
+        run: echo "ecr_repository_uri_url=$(terraform output -raw ecr_repository_uri_url)" >> "$GITHUB_OUTPUT"
+        working-directory: ./pruebaA
+
+      - name: Capturar nombre del repositorio ECR
+        id: capturar_ecr_nombre
+        run: echo "ecr_nombre_repositorio=$(terraform output -raw ecr_nombre_repositorio)" >> "$GITHUB_OUTPUT"
+        working-directory: ./pruebaA
+
+      #crear artefactos con el nombre del bucket y con el nombre del repositorio
+      - name: Crear archivo con el nombre del bucket
+        run: echo "${{ steps.capturar_bucket.outputs.bucket_nombre }}" > ./bucket_name.txt
+
+      - name: Crear archivo con el nombre del repositorio ECR
+        run: echo "${{ steps.capturar_ecr_nombre.outputs.ecr_nombre_repositorio }}" > ./ecr_name.txt
+
+      # Subir los archivos como artefactos
+      - name: Subir artefactos con el nombre del bucket y el repositorio ECR
+        uses: actions/upload-artifact@v4.5.0
+        with:
+          name: nombre bucket artefacto
+          path: ./bucket_name.txt 
+
+      - name: Subir artefactos con el nombre del bucket y el repositorio ECR
+        uses: actions/upload-artifact@v4.5.0
+        with:
+          name: nombre ecr artefacto
+          path: ./ecr_name.txt    
+
+  #tercer job lanzar la otra parte de la infraestructura
+  despliegue-resto-infraestructura:
+    runs-on: ubuntu-latest
+    needs: despliegue
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciales de AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: "us-east-1"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3    
+
+      - name: descargar tfstate del bucket
+        run: aws s3 cp s3://${{ needs.despliegue.outputs.bucket_nombre }}/terraform.tfstate ./pruebaB/terraform.tfstate --region us-east-1
+
+      - name: Verificar si el archivo tfstate fue descargado correctamente
+        run: ls -l ./pruebaB
