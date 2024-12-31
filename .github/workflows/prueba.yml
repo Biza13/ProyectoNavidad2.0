@@ -176,4 +176,4 @@ jobs:
 
       - name: Subir tfstate al bucket de S3
         run: aws s3 cp terraform.tfstate s3://${{ needs.despliegue.outputs.bucket_nombre }} --region us-east-1 
-      #  working-directory: ./pruebaB  
+        working-directory: ./pruebaB  
