@@ -1,4 +1,4 @@
-name: CI/CD a tope
+name: prueba
 
 # Evento para que se deployee cuando se hace el push
 # on:
