@@ -65,11 +65,8 @@ resource "aws_security_group" "lb_security" {
 #balanceador de carga para que siempre tengan la misma ip publica
 resource "aws_lb" "balanceador" {
   name               = "balanceador-de-carga"
-  internal           = false
-  load_balancer_type = "application"
   security_groups   = [aws_security_group.lb_security.id]
   subnets            = [aws_subnet.subred-publica.id, aws_subnet.subred-publica-az2.id]
-  enable_deletion_protection = false
 
   tags = {
     Name = "balanceador-de-carga"

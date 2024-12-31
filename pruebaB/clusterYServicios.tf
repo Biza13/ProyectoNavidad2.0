@@ -17,7 +17,7 @@ resource "aws_ecs_service" "apache_service" {
   network_configuration {
     subnets          = [aws_subnet.subred-privada.id] #ponemos el servicio de la pagina en la subred privada
     security_groups = [aws_security_group.security_ecs.id]  #ponemos el grupo de seguridad de las ecs que no permiten entrada desde internet
-    assign_public_ip = false  #para que no asigne una ip publica
+    assign_public_ip = true
   }
 
   load_balancer {
@@ -38,7 +38,7 @@ resource "aws_ecs_service" "json_server_service_3000" {
   network_configuration {
     subnets          = [aws_subnet.subred-privada.id] #ponemos el servicio de los json en la subred privada
     security_groups  = [aws_security_group.security_ecs.id]  #ponemos el grupo de seguridad de las ecs que no permiten entrada desde internet
-    assign_public_ip = false  #para que no asigne una ip publica
+    assign_public_ip = true
   }
 
   load_balancer {
@@ -59,7 +59,7 @@ resource "aws_ecs_service" "json_server_service_3001" {
   network_configuration {
     subnets          = [aws_subnet.subred-privada.id] #ponemos el servicio de los json en la subred privada
     security_groups  = [aws_security_group.security_ecs.id]  #ponemos el grupo de seguridad de las ecs que no permiten entrada desde internet
-    assign_public_ip = false  #para que no asigne una ip publica
+    assign_public_ip = true
   }
 
   load_balancer {
@@ -80,7 +80,7 @@ resource "aws_ecs_service" "json_server_service_3002" {
   network_configuration {
     subnets          = [aws_subnet.subred-privada.id] #ponemos el servicio de los json en la subred privada
     security_groups  = [aws_security_group.security_ecs.id]  #ponemos el grupo de seguridad de las ecs que no permiten entrada desde internet
-    assign_public_ip = false  #para que no asigne una ip publica
+    assign_public_ip = true
   }
 
   load_balancer {
