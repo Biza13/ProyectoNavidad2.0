@@ -1,5 +1,5 @@
-terraform {
-  backend "local" {
-    path = "./pruebaB/terraform.tfstate"
-  }
-}
+#terraform {
+#  backend "local" {
+#    path = "./pruebaB/terraform.tfstate"
+#  }
+#}
