@@ -23,7 +23,7 @@ resource "aws_ecs_task_definition" "apache_tarea" {
   container_definitions = jsonencode([
     { # Primer contenedor (Apache, para la página web)
       name      = "apache-container"
-      image     = ""
+      image     = "${aws_ecr_repository.repositorio_ecr.repository_url}:img-apachenodenpm"
       essential = true
       memory = 512
       cpu = 256
@@ -39,7 +39,7 @@ resource "aws_ecs_task_definition" "apache_tarea" {
 
     { # Segundo contenedor (API JSON)
       name      = "json-api-container"
-      image     = ""
+      image     = "${aws_ecr_repository.repositorio_ecr.repository_url}:img-jsonserver"
       essential = true 
       memory = 512
       cpu = 256
