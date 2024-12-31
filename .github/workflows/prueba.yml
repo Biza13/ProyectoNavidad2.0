@@ -157,7 +157,7 @@ jobs:
 
       - name: descargar tfstate del bucket
         run: aws s3 cp s3://${{ needs.despliegue.outputs.bucket_nombre }}/terraform.tfstate terraform.tfstate --region us-east-1
-        working-directory: pruebaB
+        working-directory: ./pruebaB
 
       - name: Terraform init
         id: init
