@@ -166,15 +166,15 @@ jobs:
 
       - name: Terraform init
         id: init
-        run: terraform init
+        run: terraform init -backend=false
         working-directory: ./pruebaB
        
       - name: Plan Terraform
-        run: terraform plan
+        run: terraform plan -state=./pruebaB/terraform.tfstate
         working-directory: ./pruebaB
   
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -state=./pruebaB/terraform.tfstate
         working-directory: ./pruebaB
 
       - name: Subir tfstate al bucket de S3
