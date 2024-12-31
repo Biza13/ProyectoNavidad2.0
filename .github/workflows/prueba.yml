@@ -155,6 +155,9 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3    
 
+      - name: Verificar si el archivo tfstate fue descargado correctamente
+        run: ls -l ./pruebaB  
+
       - name: descargar tfstate del bucket
         run: aws s3 cp s3://${{ needs.despliegue.outputs.bucket_nombre }}/terraform.tfstate ./pruebaB/terraform.tfstate --region us-east-1
 
