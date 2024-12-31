@@ -97,7 +97,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v43
+        uses: actions/checkout@v4
 
       - name: Configurar credenciales de AWS
         uses: aws-actions/configure-aws-credentials@v4
