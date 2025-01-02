@@ -7,63 +7,75 @@ data "aws_iam_role" "labrole" {
 resource "aws_ecs_task_definition" "apache_tarea" {
 
   #familia a la que pertenece la tarea
-  family                = "apache-tarea"
+  family = "apache-tarea"
 
-  execution_role_arn    = data.aws_iam_role.labrole.arn
-  task_role_arn         = data.aws_iam_role.labrole.arn 
+  execution_role_arn = data.aws_iam_role.labrole.arn
+  task_role_arn      = data.aws_iam_role.labrole.arn
 
   # Modo de red para Fargate
-  network_mode          = "awsvpc"  
+  network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
 
   # Especificar recursos a nivel de la tarea
-  cpu                      = "512"
-  memory                   = "1024"
-  
-  container_definitions = jsonencode([
-    { # Primer contenedor (Apache, para la página web)
-      name      = "apache-container"
-      image     = "${aws_ecr_repository.repositorio_ecr.repository_url}:img-apachenodenpm"
-      essential = true
-      memory = 512
-      cpu = 256
+  cpu    = "512"
+  memory = "1024"
 
-      portMappings = [
+  container_definitions = <<TASK_DEFINITION
+  [
+    {
+      "cpu": 256,
+      "entryPoint": [
+        "bash",
+        "-c",
+        "apt-get update && apt-get install -y apache2 && service apache2 start && tail -f /dev/null && apt install -y nodejs && apt install -y npm && apt install nano -y && apt clean"
+      ],
+      "environment": [
+        {"name": "VARNAME", "value": "VARVAL"}
+      ],
+      "essential": true,
+      "image": "${aws_ecr_repository.repositorio_ecr.repository_url}:img-apachenodenpm",
+      "memory": 512,
+      "name": "apache-container",
+      "portMappings": [
         {
-          containerPort = 80
-          hostPort      = 80
-          protocol      = "tcp"
+          "containerPort": 80,
+          "protocol": "tcp"
         }
       ]
     },
 
-    { # Segundo contenedor (API JSON)
-      name      = "json-api-container"
-      image     = "${aws_ecr_repository.repositorio_ecr.repository_url}:img-jsonserver"
-      essential = true 
-      memory = 512
-      cpu = 256
-
-      portMappings = [
+    {
+      "cpu": 256,
+      "entryPoint": [
+        "bash",
+        "-c",
+        "apt-get update && apt install -y nodejs && apt install -y npm && apt install nano -y && npm install -g json-server tail -f /dev/null && apt clean"
+      ],
+      "environment": [
+        {"name": "VARNAME", "value": "VARVAL"}
+      ],
+      "essential": true,
+      "image": "${aws_ecr_repository.repositorio_ecr.repository_url}:img-jsonserver",
+      "memory": 512,
+      "name": "json-api-container",
+      "portMappings": [
         {
-          containerPort = 3000  # Puerto donde se expone el primer archivo JSON (usuarios.json)
-          hostPort      = 3000
-          protocol      = "tcp"
+          "containerPort": 3000,
+          "protocol": "tcp"
         },
         {
-          containerPort = 3001  # Puerto donde se expone el segundo archivo JSON (ales.json)
-          hostPort      = 3001
-          protocol      = "tcp"
+          "containerPort": 3001,
+          "protocol": "tcp"
         },
         {
-          containerPort = 3002  # Puerto donde se expone el tercer archivo JSON (stouts.json)
-          hostPort      = 3002
-          protocol      = "tcp"
+          "containerPort": 3002,
+          "protocol": "tcp"
         }
       ]
     }
+  ]
+TASK_DEFINITION
 
-  ])
 }
 
 #--------------------GRUPOS Y REGLAS PARA GRUPOS DE PUERTOS--------------------

@@ -8,7 +8,17 @@ WORKDIR /usr/src/app
 COPY ./archivosJson /usr/src/app/api-data 
 
 # Instalar json-server globalmente
-RUN npm install -g json-server
+RUN apt update -y && \
+    # Instalar Node.js
+    apt install -y nodejs && \
+    # Instalar npm
+    apt install -y npm && \
+    # Instalar nano
+    apt install nano -y && \
+    # instalar el json server
+    npm install -g json-server && \
+    # Limpiar los archivos de cache de apt para reducir el tamaño de la imagen
+    apt clean
 
 # Exponer los puertos en los que se va a ejecutar json-server
 EXPOSE 3000
