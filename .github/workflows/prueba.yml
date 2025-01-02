@@ -165,10 +165,12 @@ jobs:
         run: ls -l ./pruebaB
 
       - name: Terraform init
-        id: init
         run: terraform init
-        
         working-directory: ./pruebaB
+
+      - name: Terraform state
+        run: terraform state list
+        working-directory: ./pruebaB  
        
       - name: Plan Terraform
         run: terraform plan
