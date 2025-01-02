@@ -165,7 +165,7 @@ jobs:
         run: ls -l ./pruebaB
 
       - name: Terraform init
-        run: terraform init
+        run: terraform init -reconfigure
         working-directory: ./pruebaB
 
       - name: Terraform state
