@@ -166,7 +166,8 @@ jobs:
 
       - name: Terraform init
         id: init
-        run: terraform init -backend=false
+        run: terraform init
+        
         working-directory: ./pruebaB
        
       - name: Plan Terraform
