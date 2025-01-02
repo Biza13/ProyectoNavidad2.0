@@ -170,11 +170,11 @@ jobs:
         working-directory: ./pruebaB
        
       - name: Plan Terraform
-        run: terraform plan -state=./pruebaB/terraform.tfstate
+        run: terraform plan
         working-directory: ./pruebaB
   
       - name: Terraform Apply
-        run: terraform apply -auto-approve -state=./pruebaB/terraform.tfstate
+        run: terraform apply -auto-approve
         working-directory: ./pruebaB
 
       - name: Subir tfstate al bucket de S3
